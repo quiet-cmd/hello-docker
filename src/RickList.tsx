@@ -12,15 +12,11 @@ const RickList: React.FC = () => {
   useEffect(() => {
     const fetchRicks = async () => {
       try {
-        // Assuming your server is running on http://localhost:3000
-        // Adjust the URL if your server is hosted elsewhere or on a different port
-        // Changed to a relative path to avoid mixed content issues when served over HTTPS
-        const response = await fetch('/');
+        const response = await fetch('/api/');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        // Assuming the server response has a 'results' array
         if (data && Array.isArray(data.results)) {
           setRicks(data.results);
         } else {
@@ -34,7 +30,7 @@ const RickList: React.FC = () => {
     };
 
     fetchRicks();
-  }, []); // Empty dependency array means this effect runs once after initial render
+  }, []);
 
   if (loading) {
     return <div>Loading Ricks...</div>;
