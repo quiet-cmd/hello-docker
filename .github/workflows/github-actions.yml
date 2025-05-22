@@ -28,19 +28,35 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - name: Run sshpass commands
-        uses: matheusvanzan/sshpass-action@v2
+      - name: vps update
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HOST_IP }}
-          user: ${{ secrets.HOST_USER }}
-          pass: ${{ secrets.HOST_PASSWORD }}
-          run: |
+          username: ${{ secrets.HOST_USER }}
+          password: ${{ secrets.HOST_PASSWORD }}
+          script: |
             cd /root/hello-docker
             git pull
-            # here
+            docker pull quietcmd/hello-docker
+            rm -r static
 
-      - name: Deploy build artifacts to VPS
-        run: |
-          scp -r ./dist/* root@${{ secrets.HOST_IP }}:/root/hello-docker/static/
-        env:
-          HOME: /home/runner
+      - name: vps add dist
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOST_IP }}
+          username: ${{ secrets.HOST_USER }}
+          password: ${{ secrets.HOST_PASSWORD }}
+          source: "dist"
+          target: /root/hello-docker/
+
+      - name: vps restart nginx
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST_IP }}
+          username: ${{ secrets.HOST_USER }}
+          password: ${{ secrets.HOST_PASSWORD }}
+          script: |
+            cd /root/hello-docker
+            mv dist static
+            docker compose restart nginx
+            
