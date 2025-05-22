@@ -14,7 +14,8 @@ const RickList: React.FC = () => {
       try {
         // Assuming your server is running on http://localhost:3000
         // Adjust the URL if your server is hosted elsewhere or on a different port
-        const response = await fetch('http://localhost:3000/');
+        // Changed to a relative path to avoid mixed content issues when served over HTTPS
+        const response = await fetch('/');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
